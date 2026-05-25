@@ -1,0 +1,233 @@
+@model AdminPaymentRequestReviewViewModel
+
+@{
+    ViewData["Title"] = "Review Payment Request";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Review @Model.RequestIdDisplay</h1>
+        <p class="text-muted mb-0">Approve, split, or reject this payment request.</p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        Back to Pending
+    </a>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Company</div>
+                <div class="fw-semibold">@Model.CompanyDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Vendor</div>
+                <div class="fw-semibold">@Model.VendorDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Priority</div>
+                <span class="badge @Model.PriorityBadgeClass">@Model.Priority</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Requested Amount</div>
+                <div class="fs-5 fw-semibold font-monospace">@Model.RequestedAmountDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Scheduled Date</div>
+                <div class="fw-semibold">@Model.ScheduledPaymentDateDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Requested IST</div>
+                <div class="fw-semibold">@Model.RequestedAtDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Requested By</div>
+                <div class="fw-semibold">@Model.RequestedByName</div>
+                <div class="small text-muted">@Model.RequestedByEmail</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="text-muted small mb-1">Request Notes</div>
+        <div>@Model.RequestNotesDisplay</div>
+    </div>
+</div>
+
+@if (!Model.LedgerOptions.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        No active ledgers are available. Activate or create a ledger before approving or splitting requests.
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Approve Full</h2>
+
+                <form asp-action="ApproveFull"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      asp-antiforgery="true">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="ApprovedLedgerMasterId" class="form-label"></label>
+                        <select asp-for="ApprovedLedgerMasterId"
+                                asp-items="Model.LedgerOptions"
+                                class="form-select">
+                            <option value="">Select ledger</option>
+                        </select>
+                        <span asp-validation-for="ApprovedLedgerMasterId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ReviewNotes" class="form-label"></label>
+                        <textarea asp-for="ReviewNotes"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Optional approval note"></textarea>
+                        <span asp-validation-for="ReviewNotes" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-success w-100"
+                            disabled="@(!Model.LedgerOptions.Any())">
+                        Approve Full
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Split Payment</h2>
+
+                <form asp-action="Split"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      asp-antiforgery="true">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="ApprovedLedgerMasterId" class="form-label"></label>
+                        <select asp-for="ApprovedLedgerMasterId"
+                                asp-items="Model.LedgerOptions"
+                                class="form-select">
+                            <option value="">Select ledger</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SplitApprovedAmount" class="form-label"></label>
+                        <input asp-for="SplitApprovedAmount"
+                               class="form-control"
+                               min="0.01"
+                               step="0.01"
+                               autocomplete="off" />
+                        <span asp-validation-for="SplitApprovedAmount" class="text-danger"></span>
+                        <div class="form-text">
+                            Must be less than @Model.RequestedAmountDisplay.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SplitRemainderScheduledPaymentDate" class="form-label"></label>
+                        <input asp-for="SplitRemainderScheduledPaymentDate"
+                               class="form-control"
+                               type="date" />
+                        <span asp-validation-for="SplitRemainderScheduledPaymentDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ReviewNotes" class="form-label"></label>
+                        <textarea asp-for="ReviewNotes"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Optional split note"></textarea>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-warning w-100"
+                            disabled="@(!Model.LedgerOptions.Any())">
+                        Split Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Reject</h2>
+
+                <form asp-action="Reject"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      asp-antiforgery="true">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="ReviewNotes" class="form-label"></label>
+                        <textarea asp-for="ReviewNotes"
+                                  class="form-control"
+                                  rows="7"
+                                  placeholder="Reason for rejection"></textarea>
+                        <span asp-validation-for="ReviewNotes" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100">
+                        Reject Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

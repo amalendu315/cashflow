@@ -50,6 +50,13 @@
                                     Users
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                asp-controller="AdminPaymentRequests"
+                                asp-action="Index">
+                                    Review Requests
+                                </a>
+                            </li>
                         }
                         @if (User.IsInRole(AppRoles.User))
                         {
