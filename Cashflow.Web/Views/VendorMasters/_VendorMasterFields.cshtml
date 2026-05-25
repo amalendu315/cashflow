@@ -1,0 +1,26 @@
+@model VendorMasterFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<div class="mb-3">
+    <label asp-for="VendorCode" class="form-label"></label>
+    <input asp-for="VendorCode" class="form-control" autocomplete="off" />
+    <span asp-validation-for="VendorCode" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="VendorName" class="form-label"></label>
+    <input asp-for="VendorName" class="form-control" autocomplete="off" />
+    <span asp-validation-for="VendorName" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="GstNumber" class="form-label"></label>
+    <input asp-for="GstNumber" class="form-control" autocomplete="off" />
+    <span asp-validation-for="GstNumber" class="text-danger"></span>
+</div>
+
+<div class="form-check form-switch mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>
