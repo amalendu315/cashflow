@@ -50,6 +50,7 @@ builder.Services.AddScoped<IVendorMasterService, VendorMasterService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IPaymentRequestSubmissionService, PaymentRequestSubmissionService>();
 builder.Services.AddScoped<IPaymentRequestTrackingService, PaymentRequestTrackingService>();
+builder.Services.AddScoped<IAdminPaymentRequestReviewService, AdminPaymentRequestReviewService>();
 
 builder.Services.AddControllersWithViews();
 

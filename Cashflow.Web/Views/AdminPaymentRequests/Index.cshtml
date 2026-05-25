@@ -1,0 +1,114 @@
+@model AdminPaymentRequestIndexViewModel
+
+@{
+    ViewData["Title"] = "Pending Payment Requests";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Pending Payment Requests</h1>
+        <p class="text-muted mb-0">Review subsidiary payment requests awaiting action.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Pending Requests</div>
+                <div class="fs-4 fw-semibold">@Model.TotalPendingCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Pending Amount</div>
+                <div class="fs-4 fw-semibold">@Model.TotalPendingAmountDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">High Priority</div>
+                <div class="fs-4 fw-semibold">@Model.HighPriorityCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.HasPendingRequests)
+{
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <h2 class="h5">No pending requests</h2>
+            <p class="text-muted mb-0">All payment requests have been reviewed.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Company</th>
+                    <th>Vendor</th>
+                    <th>Priority</th>
+                    <th>Scheduled Date</th>
+                    <th>Amount</th>
+                    <th>Requested By</th>
+                    <th>Requested IST</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (AdminPaymentRequestListItemViewModel request in Model.PendingRequests)
+                {
+                    <tr>
+                        <td class="font-monospace fw-semibold">@request.RequestIdDisplay</td>
+                        <td>
+                            <div>@request.CompanyName</div>
+                            <div class="small text-muted font-monospace">@request.CompanyCode</div>
+                        </td>
+                        <td>
+                            <div>@request.VendorName</div>
+                            <div class="small text-muted font-monospace">@request.VendorCode</div>
+                        </td>
+                        <td>
+                            <span class="badge @request.PriorityBadgeClass">
+                                @request.Priority
+                            </span>
+                        </td>
+                        <td>@request.ScheduledPaymentDateDisplay</td>
+                        <td class="font-monospace">@request.RequestedAmountDisplay</td>
+                        <td>
+                            <div>@request.RequestedByName</div>
+                            <div class="small text-muted">@request.RequestedByEmail</div>
+                        </td>
+                        <td>@request.RequestedAtDisplay</td>
+                        <td class="text-end">
+                            <a asp-action="Review"
+                               asp-route-id="@request.Id"
+                               class="btn btn-sm btn-primary">
+                                Review
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
