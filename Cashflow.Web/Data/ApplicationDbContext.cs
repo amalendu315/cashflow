@@ -139,6 +139,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasMaxLength(20)
                 .HasDefaultValue(PaymentPriority.Normal);
 
+            entity.Property(request => request.ScheduledPaymentDate)
+                .HasColumnType("date")
+                .IsRequired()
+                .HasDefaultValueSql("CONVERT(date, DATEADD(MINUTE, 330, SYSUTCDATETIME()))")
+    .HasSentinel(DateOnly.MinValue);
+
             entity.Property(request => request.RequestNotes)
                 .HasMaxLength(500);
 

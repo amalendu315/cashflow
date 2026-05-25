@@ -10,11 +10,23 @@ namespace Cashflow.Web.Controllers;
 public class PaymentRequestsController : Controller
 {
     private readonly IPaymentRequestSubmissionService _paymentRequestSubmissionService;
+    private readonly IPaymentRequestTrackingService _paymentRequestTrackingService;
 
     public PaymentRequestsController(
-        IPaymentRequestSubmissionService paymentRequestSubmissionService)
+        IPaymentRequestSubmissionService paymentRequestSubmissionService,
+        IPaymentRequestTrackingService paymentRequestTrackingService)
     {
         _paymentRequestSubmissionService = paymentRequestSubmissionService;
+        _paymentRequestTrackingService = paymentRequestTrackingService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        PaymentRequestIndexViewModel model =
+            await _paymentRequestTrackingService.GetIndexAsync(User, cancellationToken);
+
+        return View(model);
     }
 
     [HttpGet]
@@ -66,6 +78,6 @@ public class PaymentRequestsController : Controller
         TempData["SuccessMessage"] =
             $"Payment request #{result.PaymentRequestId} submitted successfully.";
 
-        return RedirectToAction(nameof(Create));
+        return RedirectToAction(nameof(Index));
     }
 }

@@ -127,6 +127,12 @@ public class PaymentRequestSubmissionService : IPaymentRequestSubmissionService
                 "Please select a valid payment priority.");
         }
 
+        if (!model.ScheduledPaymentDate.HasValue)
+        {
+            return PaymentRequestOperationResult.Failure(
+                "Scheduled payment date is required.");
+        }
+
         bool companyExists = await _dbContext.CompanyMasters
             .AsNoTracking()
             .AnyAsync(
@@ -162,6 +168,7 @@ public class PaymentRequestSubmissionService : IPaymentRequestSubmissionService
             RequestedAmount = model.RequestedAmount.Value,
             Status = PaymentRequestStatus.Pending,
             Priority = model.Priority.Value,
+            ScheduledPaymentDate = model.ScheduledPaymentDate.Value,
             RequestNotes = requestNotes,
             RequestedByUserId = currentUser.Id,
             RequestedAtUtc = DateTime.UtcNow

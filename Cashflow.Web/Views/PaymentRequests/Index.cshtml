@@ -1,0 +1,145 @@
+@model PaymentRequestIndexViewModel
+
+@{
+    ViewData["Title"] = "Payment Requests";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Payment Requests</h1>
+        <p class="text-muted mb-0">
+            Track requests for @Model.CompanyDisplay.
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        New Request
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.HasError)
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.ErrorMessage
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-muted small">Total Requests</div>
+                    <div class="fs-4 fw-semibold">@Model.TotalCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-muted small">Pending</div>
+                    <div class="fs-4 fw-semibold">@Model.PendingCount</div>
+                    <div class="small text-muted">@Model.TotalPendingAmountDisplay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-muted small">Approved</div>
+                    <div class="fs-4 fw-semibold">@Model.ApprovedCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="text-muted small">High Priority</div>
+                    <div class="fs-4 fw-semibold">@Model.HighPriorityCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.HasRequests)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5">No payment requests yet</h2>
+                <p class="text-muted mb-3">
+                    Submit your first payment request using an active approved vendor.
+                </p>
+                <a asp-action="Create" class="btn btn-primary">New Request</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Vendor</th>
+                        <th>Priority</th>
+                        <th>Scheduled Date</th>
+                        <th>Status</th>
+                        <th>Requested Amount</th>
+                        <th>Approved Amount</th>
+                        <th>Request Notes</th>
+                        <th>Requested By</th>
+                        <th>Requested On</th>
+                        <th>Review Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (PaymentRequestListItemViewModel request in Model.Requests)
+                    {
+                        <tr>
+                            <td class="font-monospace fw-semibold">@request.RequestIdDisplay</td>
+                            <td>
+                                <div>@request.VendorName</div>
+                                <div class="small text-muted font-monospace">@request.VendorCode</div>
+                            </td>
+                            <td>
+                                <span class="badge @request.PriorityBadgeClass">
+                                    @request.Priority
+                                </span>
+                            </td>
+                            <td>@request.ScheduledPaymentDateDisplay</td>
+                            <td>
+                                <span class="badge @request.StatusBadgeClass">
+                                    @request.Status
+                                </span>
+                            </td>
+                            <td class="font-monospace">@request.RequestedAmountDisplay</td>
+                            <td>@request.RequestNotesDisplay</td>
+                            <td class="font-monospace">@request.ApprovedAmountDisplay</td>
+                            <td>
+                                <div>@request.RequestedByName</div>
+                                <div class="small text-muted">@request.RequestedByEmail</div>
+                            </td>
+                            <td>@request.RequestedAtDisplay</td>
+                            <td>@request.ReviewNotesDisplay</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="small text-muted mt-3">
+            Split, approval, and rejection details will appear here after Admin review.
+        </div>
+    }
+}

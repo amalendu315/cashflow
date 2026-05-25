@@ -47,5 +47,5 @@ public class PaymentRequest
 
     public DateTime? ReviewedAtUtc { get; set; }
 
-    public DateTime? ScheduledPaymentDateUtc { get; set; }
+    public DateOnly ScheduledPaymentDate { get; set; }
 }
