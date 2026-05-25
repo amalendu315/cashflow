@@ -1,0 +1,43 @@
+@model CompanyMasterFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Company";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Edit Company</h1>
+        <p class="text-muted mb-0">Update company master details.</p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        Back to List
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit"
+              asp-route-id="@Model.Id"
+              method="post"
+              asp-antiforgery="true">
+            <input type="hidden" asp-for="Id" />
+
+            <partial name="_CompanyMasterFields" model="Model" />
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

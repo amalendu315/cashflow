@@ -1,4 +1,5 @@
 using Cashflow.Web.Constants;
+using Cashflow.Web.Services;
 using Cashflow.Web.Data;
 using Cashflow.Web.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,7 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddScoped<ICompanyMasterService, CompanyMasterService>();
 
 builder.Services.AddControllersWithViews();
 
