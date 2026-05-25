@@ -1,0 +1,21 @@
+@page
+@model Cashflow.Web.Areas.Identity.Pages.Account.RegisterModel
+
+@{
+    ViewData["Title"] = "Registration Disabled";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <h1 class="h4 mb-2">Registration is disabled</h1>
+        <p class="text-muted mb-3">
+            User accounts are created by the system administrator.
+        </p>
+
+        <a asp-area="Identity"
+           asp-page="/Account/Login"
+           class="btn btn-primary">
+            Go to Login
+        </a>
+    </div>
+</div>

@@ -21,6 +21,12 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
+
+
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -41,6 +47,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<ICompanyMasterService, CompanyMasterService>();
 builder.Services.AddScoped<ILedgerMasterService, LedgerMasterService>();
 builder.Services.AddScoped<IVendorMasterService, VendorMasterService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
 builder.Services.AddControllersWithViews();
 
