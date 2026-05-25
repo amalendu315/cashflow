@@ -1,4 +1,5 @@
 using Cashflow.Web.Models.Enums;
+using Cashflow.Web.Utilities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,6 +14,11 @@ public class PaymentRequestCreateViewModel
     [Required]
     [Display(Name = "Payment Priority")]
     public PaymentPriority? Priority { get; set; } = PaymentPriority.Normal;
+
+    [Required]
+    [DataType(DataType.Date)]
+    [Display(Name = "Scheduled Payment Date")]
+    public DateOnly? ScheduledPaymentDate { get; set; } = AppClock.TodayIst();
 
     [Required]
     [Range(

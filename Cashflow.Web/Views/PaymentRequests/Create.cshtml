@@ -11,6 +11,10 @@
             Submit a payment request using an approved vendor.
         </p>
     </div>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        View Requests
+    </a>
 </div>
 
 @if (TempData["SuccessMessage"] is string successMessage)
@@ -50,6 +54,14 @@
                         class="form-select">
                 </select>
                 <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ScheduledPaymentDate" class="form-label"></label>
+                <input asp-for="ScheduledPaymentDate"
+                    class="form-control"
+                    type="date" />
+                <span asp-validation-for="ScheduledPaymentDate" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
