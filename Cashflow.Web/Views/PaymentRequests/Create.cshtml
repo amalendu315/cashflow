@@ -1,0 +1,91 @@
+@model PaymentRequestCreateViewModel
+
+@{
+    ViewData["Title"] = "New Payment Request";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">New Payment Request</h1>
+        <p class="text-muted mb-0">
+            Submit a payment request using an approved vendor.
+        </p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!Model.VendorOptions.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        No active vendors are available. Please contact the accounts team.
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" method="post" asp-antiforgery="true">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="VendorMasterId" class="form-label"></label>
+                <select asp-for="VendorMasterId"
+                        asp-items="Model.VendorOptions"
+                        class="form-select">
+                    <option value="">Select vendor</option>
+                </select>
+                <span asp-validation-for="VendorMasterId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Priority" class="form-label"></label>
+                <select asp-for="Priority"
+                        asp-items="Model.PriorityOptions"
+                        class="form-select">
+                </select>
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RequestedAmount" class="form-label"></label>
+                <input asp-for="RequestedAmount"
+                       class="form-control"
+                       min="0.01"
+                       step="0.01"
+                       autocomplete="off" />
+                <span asp-validation-for="RequestedAmount" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RequestNotes" class="form-label"></label>
+                <textarea asp-for="RequestNotes"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Add invoice details, purpose, due date, or other context."></textarea>
+                <span asp-validation-for="RequestNotes" class="text-danger"></span>
+            </div>
+
+            <div class="alert alert-info mb-3" role="alert">
+                This request will be linked to your assigned company automatically.
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit"
+                        class="btn btn-primary"
+                        disabled="@(!Model.VendorOptions.Any())">
+                    Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

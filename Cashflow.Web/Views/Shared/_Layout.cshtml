@@ -51,6 +51,16 @@
                                 </a>
                             </li>
                         }
+                        @if (User.IsInRole(AppRoles.User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                asp-controller="PaymentRequests"
+                                asp-action="Create">
+                                    New Request
+                                </a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

@@ -48,6 +48,7 @@ builder.Services.AddScoped<ICompanyMasterService, CompanyMasterService>();
 builder.Services.AddScoped<ILedgerMasterService, LedgerMasterService>();
 builder.Services.AddScoped<IVendorMasterService, VendorMasterService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<IPaymentRequestSubmissionService, PaymentRequestSubmissionService>();
 
 builder.Services.AddControllersWithViews();
 

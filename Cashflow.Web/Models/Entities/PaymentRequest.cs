@@ -17,6 +17,7 @@ public class PaymentRequest
     public decimal RequestedAmount { get; set; }
 
     public PaymentRequestStatus Status { get; set; } = PaymentRequestStatus.Pending;
+    public PaymentPriority Priority { get; set; } = PaymentPriority.Normal;
 
     public int? ApprovedLedgerMasterId { get; set; }
 

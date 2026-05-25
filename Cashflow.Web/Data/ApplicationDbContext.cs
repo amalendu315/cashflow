@@ -1,4 +1,5 @@
-﻿using Cashflow.Web.Models.Entities;
+﻿using Cashflow.Web.Models.Enums;
+using Cashflow.Web.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -131,6 +132,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasConversion<string>()
                 .IsRequired()
                 .HasMaxLength(30);
+
+            entity.Property(request => request.Priority)
+                .HasConversion<string>()
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasDefaultValue(PaymentPriority.Normal);
 
             entity.Property(request => request.RequestNotes)
                 .HasMaxLength(500);
