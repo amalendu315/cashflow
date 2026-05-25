@@ -40,6 +40,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<ICompanyMasterService, CompanyMasterService>();
 builder.Services.AddScoped<ILedgerMasterService, LedgerMasterService>();
+builder.Services.AddScoped<IVendorMasterService, VendorMasterService>();
 
 builder.Services.AddControllersWithViews();
 
