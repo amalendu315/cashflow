@@ -42,6 +42,7 @@ public class PaymentRequest
     public PaymentRequest? ParentPaymentRequest { get; set; }
 
     public ICollection<PaymentRequest> SplitChildren { get; set; } = new List<PaymentRequest>();
+    public ICollection<LedgerEntry> LedgerEntries { get; set; } = new List<LedgerEntry>();
 
     public DateTime RequestedAtUtc { get; set; } = DateTime.UtcNow;
 
