@@ -16,6 +16,12 @@ public interface ILedgerBalanceService
         DateOnly? entryDate,
         CancellationToken cancellationToken = default);
 
+    Task<LedgerReportIndexViewModel> GetReportAsync(
+        int? ledgerMasterId,
+        DateOnly? fromDate,
+        DateOnly? toDate,
+        CancellationToken cancellationToken = default);
+
     Task PopulateLedgerOptionsAsync(
         LedgerBalanceIndexViewModel model,
         CancellationToken cancellationToken = default);
