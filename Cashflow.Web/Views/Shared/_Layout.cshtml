@@ -57,6 +57,13 @@
                                     Review Requests
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                asp-controller="LedgerBalances"
+                                asp-action="Index">
+                                    Ledger Balances
+                                </a>
+                            </li>
                         }
                         @if (User.IsInRole(AppRoles.User))
                         {
