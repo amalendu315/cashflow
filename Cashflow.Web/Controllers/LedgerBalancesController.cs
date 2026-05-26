@@ -31,6 +31,23 @@ public class LedgerBalancesController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Report(
+    int? ledgerMasterId,
+    DateOnly? fromDate,
+    DateOnly? toDate,
+    CancellationToken cancellationToken)
+    {
+        LedgerReportIndexViewModel model =
+            await _ledgerBalanceService.GetReportAsync(
+                ledgerMasterId,
+                fromDate,
+                toDate,
+                cancellationToken);
+
+        return View(model);
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SaveOpeningBalance(

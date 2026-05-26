@@ -64,6 +64,13 @@
                                     Ledger Balances
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                asp-controller="LedgerBalances"
+                                asp-action="Report">
+                                    Ledger Report
+                                </a>
+                            </li>
                         }
                         @if (User.IsInRole(AppRoles.User))
                         {

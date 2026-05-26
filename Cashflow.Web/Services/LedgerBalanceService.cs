@@ -278,6 +278,85 @@ public class LedgerBalanceService : ILedgerBalanceService
         return LedgerEntryOperationResult.Success();
     }
 
+    public async Task<LedgerReportIndexViewModel> GetReportAsync(
+    int? ledgerMasterId,
+    DateOnly? fromDate,
+    DateOnly? toDate,
+    CancellationToken cancellationToken = default)
+    {
+        DateOnly resolvedFromDate = fromDate ?? AppClock.TodayIst();
+        DateOnly resolvedToDate = toDate ?? AppClock.TodayIst();
+
+        LedgerReportIndexViewModel model = new()
+        {
+            LedgerMasterId = ledgerMasterId,
+            FromDate = resolvedFromDate,
+            ToDate = resolvedToDate
+        };
+
+        List<SelectListItem> ledgerOptions = await _dbContext.LedgerMasters
+            .AsNoTracking()
+            .Where(ledger => ledger.IsActive)
+            .OrderBy(ledger => ledger.LedgerName)
+            .Select(ledger => new SelectListItem
+            {
+                Value = ledger.Id.ToString(CultureInfo.InvariantCulture),
+                Text = ledger.LedgerName + " (" + ledger.LedgerCode + ")",
+                Selected = ledgerMasterId.HasValue && ledger.Id == ledgerMasterId.Value
+            })
+            .ToListAsync(cancellationToken);
+
+        model.LedgerOptions = ledgerOptions;
+
+        if (!ledgerMasterId.HasValue || model.HasDateError)
+        {
+            return model;
+        }
+
+        var ledgerInfo = await _dbContext.LedgerMasters
+            .AsNoTracking()
+            .Where(ledger => ledger.Id == ledgerMasterId.Value)
+            .Select(ledger => new
+            {
+                ledger.LedgerCode,
+                ledger.LedgerName
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (ledgerInfo is null)
+        {
+            return model;
+        }
+
+        model.LedgerCode = ledgerInfo.LedgerCode;
+        model.LedgerName = ledgerInfo.LedgerName;
+
+        model.Entries = await _dbContext.LedgerEntries
+            .AsNoTracking()
+            .Where(entry =>
+                entry.LedgerMasterId == ledgerMasterId.Value &&
+                entry.EntryDate >= resolvedFromDate &&
+                entry.EntryDate <= resolvedToDate)
+            .OrderBy(entry => entry.EntryDate)
+            .ThenBy(entry => entry.EntryType)
+            .ThenBy(entry => entry.CreatedAtUtc)
+            .Select(entry => new LedgerReportEntryViewModel
+            {
+                Id = entry.Id,
+                EntryDate = entry.EntryDate,
+                EntryType = entry.EntryType,
+                Amount = entry.Amount,
+                Description = entry.Description,
+                PaymentRequestId = entry.PaymentRequestId,
+                CreatedByName = entry.CreatedByUser.FullName,
+                CreatedByEmail = entry.CreatedByUser.Email ?? string.Empty,
+                CreatedAtUtc = entry.CreatedAtUtc
+            })
+            .ToListAsync(cancellationToken);
+
+        return model;
+    }
+
     public async Task<LedgerEntryOperationResult> QueueApprovedPaymentOutflowAsync(
         PaymentRequest paymentRequest,
         string adminUserId,
