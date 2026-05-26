@@ -15,13 +15,16 @@ public class AdminPaymentRequestReviewService : IAdminPaymentRequestReviewServic
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ILedgerBalanceService _ledgerBalanceService;
 
     public AdminPaymentRequestReviewService(
-        ApplicationDbContext dbContext,
-        UserManager<ApplicationUser> userManager)
+     ApplicationDbContext dbContext,
+     UserManager<ApplicationUser> userManager,
+     ILedgerBalanceService ledgerBalanceService)
     {
         _dbContext = dbContext;
         _userManager = userManager;
+        _ledgerBalanceService = ledgerBalanceService;
     }
 
     public async Task<AdminPaymentRequestIndexViewModel> GetPendingIndexAsync(
@@ -163,6 +166,18 @@ public class AdminPaymentRequestReviewService : IAdminPaymentRequestReviewServic
         request.ReviewedByUserId = adminUser.Id;
         request.ReviewedAtUtc = DateTime.UtcNow;
 
+        LedgerEntryOperationResult outflowResult =
+    await _ledgerBalanceService.QueueApprovedPaymentOutflowAsync(
+        request,
+        adminUser.Id,
+        cancellationToken);
+
+        if (!outflowResult.Succeeded)
+        {
+            return AdminPaymentRequestReviewResult.Failure(
+                outflowResult.ErrorMessage ?? "Could not create ledger outflow.");
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return AdminPaymentRequestReviewResult.Success();
@@ -288,6 +303,18 @@ public class AdminPaymentRequestReviewService : IAdminPaymentRequestReviewServic
         request.ReviewNotes = NormalizeNotes(model.ReviewNotes);
         request.ReviewedByUserId = adminUser.Id;
         request.ReviewedAtUtc = DateTime.UtcNow;
+
+        LedgerEntryOperationResult outflowResult =
+    await _ledgerBalanceService.QueueApprovedPaymentOutflowAsync(
+        request,
+        adminUser.Id,
+        cancellationToken);
+
+        if (!outflowResult.Succeeded)
+        {
+            return AdminPaymentRequestReviewResult.Failure(
+                outflowResult.ErrorMessage ?? "Could not create ledger outflow.");
+        }
 
         PaymentRequest childRequest = new()
         {

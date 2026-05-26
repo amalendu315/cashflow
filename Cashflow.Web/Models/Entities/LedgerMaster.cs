@@ -15,4 +15,5 @@ public class LedgerMaster
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public ICollection<PaymentRequest> ApprovedPaymentRequests { get; set; } = new List<PaymentRequest>();
+    public ICollection<LedgerEntry> LedgerEntries { get; set; } = new List<LedgerEntry>();
 }

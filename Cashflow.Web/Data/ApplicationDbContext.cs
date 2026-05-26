@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<CompanyMaster> CompanyMasters => Set<CompanyMaster>();
 
     public DbSet<LedgerMaster> LedgerMasters => Set<LedgerMaster>();
+    public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
 
     public DbSet<VendorMaster> VendorMasters => Set<VendorMaster>();
 
@@ -87,6 +88,70 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             entity.HasIndex(ledger => ledger.LedgerCode)
                 .IsUnique();
+        });
+
+        builder.Entity<LedgerEntry>(entity =>
+        {
+            entity.ToTable("LedgerEntries");
+
+            entity.HasKey(entry => entry.Id);
+
+            entity.Property(entry => entry.EntryDate)
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(entry => entry.EntryType)
+                .HasConversion<string>()
+                .IsRequired()
+                .HasMaxLength(30);
+
+            entity.Property(entry => entry.Amount)
+                .HasPrecision(18, 2);
+
+            entity.Property(entry => entry.Description)
+                .HasMaxLength(500);
+
+            entity.Property(entry => entry.CreatedByUserId)
+                .IsRequired();
+
+            entity.Property(entry => entry.CreatedAtUtc)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(entry => entry.LedgerMaster)
+                .WithMany(ledger => ledger.LedgerEntries)
+                .HasForeignKey(entry => entry.LedgerMasterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(entry => entry.PaymentRequest)
+                .WithMany(request => request.LedgerEntries)
+                .HasForeignKey(entry => entry.PaymentRequestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(entry => entry.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(entry => entry.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(entry => new
+            {
+                entry.LedgerMasterId,
+                entry.EntryDate,
+                entry.EntryType
+            });
+
+            entity.HasIndex(entry => entry.PaymentRequestId)
+                .IsUnique()
+                .HasFilter("[PaymentRequestId] IS NOT NULL");
+
+            entity.HasIndex(entry => new
+            {
+                entry.LedgerMasterId,
+                entry.EntryDate,
+                entry.EntryType
+            })
+                .IsUnique()
+                .HasFilter("[EntryType] = 'OpeningBalance'")
+                .HasDatabaseName("IX_LedgerEntries_OneOpeningBalancePerLedgerDate");
         });
 
         builder.Entity<VendorMaster>(entity =>
