@@ -1,0 +1,244 @@
+@model LedgerBalanceIndexViewModel
+
+@{
+    ViewData["Title"] = "Ledger Balances";
+
+    decimal openingAmount = Model.Balance?.OpeningBalance ?? 0;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Ledger Balances</h1>
+        <p class="text-muted mb-0">Track opening balance, inflows, approved outflows, and closing balance.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label asp-for="LedgerMasterId" class="form-label"></label>
+                <select asp-for="LedgerMasterId"
+                        asp-items="Model.LedgerOptions"
+                        class="form-select">
+                    <option value="">Select ledger</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="EntryDate" class="form-label"></label>
+                <input asp-for="EntryDate" class="form-control" type="date" />
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    Load Balance
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.HasLedgerSelected)
+{
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <h2 class="h5">Select a ledger</h2>
+            <p class="text-muted mb-0">Choose a ledger and business date to view or enter balances.</p>
+        </div>
+    </div>
+}
+else if (!Model.HasBalance)
+{
+    <div class="alert alert-warning" role="alert">
+        The selected ledger was not found or is unavailable.
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Opening Balance</div>
+                    <div class="fs-5 fw-semibold font-monospace">@Model.Balance?.OpeningBalanceDisplay</div>
+                    <div class="small text-muted">@Model.Balance?.EntryDateDisplay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Total Inflow</div>
+                    <div class="fs-5 fw-semibold font-monospace">@Model.Balance?.TotalInflowDisplay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Total Outflow</div>
+                    <div class="fs-5 fw-semibold font-monospace">@Model.Balance?.TotalOutflowDisplay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Closing Balance</div>
+                    <div class="fs-5 fw-semibold font-monospace">@Model.Balance?.ClosingBalanceDisplay</div>
+                    <div class="small text-muted">Opening + Inflow - Outflow</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Opening Balance</h2>
+
+                    <form asp-action="SaveOpeningBalance" method="post" asp-antiforgery="true">
+                        <input type="hidden" name="LedgerMasterId" value="@Model.LedgerMasterId" />
+                        <input type="hidden" name="EntryDate" value="@Model.EntryDate.ToString("yyyy-MM-dd")" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Opening Balance</label>
+                            <input name="Amount"
+                                   class="form-control"
+                                   type="number"
+                                   min="0"
+                                   step="0.01"
+                                   value="@openingAmount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="Description"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Opening balance for the selected date."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-info w-100">
+                            Save Opening Balance
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Manual Inflow</h2>
+
+                    <form asp-action="AddManualInflow" method="post" asp-antiforgery="true">
+                        <input type="hidden" name="LedgerMasterId" value="@Model.LedgerMasterId" />
+                        <input type="hidden" name="EntryDate" value="@Model.EntryDate.ToString("yyyy-MM-dd")" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Inflow Amount</label>
+                            <input name="Amount"
+                                   class="form-control"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="Description"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Example: Client fund received, cash deposit, bank transfer."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">
+                            Add Inflow
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Ledger Entries</h2>
+                    <p class="text-muted mb-0">@Model.Balance?.LedgerName (@Model.Balance?.LedgerCode) — @Model.EntryDateDisplay</p>
+                </div>
+            </div>
+
+            @if (!Model.HasEntries)
+            {
+                <div class="text-center text-muted py-4">
+                    No entries found for this ledger and date.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Payment Request</th>
+                                <th>Description</th>
+                                <th>Created By</th>
+                                <th>Created IST</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (LedgerEntryListItemViewModel entry in Model.Entries)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="badge @entry.EntryTypeBadgeClass">
+                                            @entry.EntryType
+                                        </span>
+                                    </td>
+                                    <td class="font-monospace">@entry.AmountDisplay</td>
+                                    <td class="font-monospace">@entry.PaymentRequestDisplay</td>
+                                    <td>@entry.DescriptionDisplay</td>
+                                    <td>
+                                        <div>@entry.CreatedByName</div>
+                                        <div class="small text-muted">@entry.CreatedByEmail</div>
+                                    </td>
+                                    <td>@entry.CreatedAtDisplay</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
