@@ -146,7 +146,7 @@ else
                                 @if (entry.PaymentRequestId.HasValue)
                                 {
                                     <a asp-controller="AdminPaymentRequests"
-                                       asp-action="Review"
+                                       asp-action="Details"
                                        asp-route-id="@entry.PaymentRequestId.Value"
                                        class="link-info">
                                         @entry.PaymentRequestDisplay

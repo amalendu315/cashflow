@@ -1,0 +1,259 @@
+@model PaymentRequestDetailsViewModel
+
+@{
+    ViewData["Title"] = "Payment Request Details";
+
+    string backController = Model.IsAdminView ? "AdminPaymentRequests" : "PaymentRequests";
+    string backAction = Model.IsAdminView ? "Index" : "Index";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">@Model.RequestIdDisplay</h1>
+        <p class="text-muted mb-0">Payment request details and audit trail.</p>
+    </div>
+
+    <a asp-controller="@backController"
+       asp-action="@backAction"
+       class="btn btn-outline-secondary">
+        Back
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Status</div>
+                <span class="badge @Model.StatusBadgeClass">@Model.Status</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Priority</div>
+                <span class="badge @Model.PriorityBadgeClass">@Model.Priority</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Requested Amount</div>
+                <div class="fs-5 fw-semibold font-monospace">@Model.RequestedAmountDisplay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Approved Amount</div>
+                <div class="fs-5 fw-semibold font-monospace">@Model.ApprovedAmountDisplay</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Request Information</h2>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Company</dt>
+                    <dd class="col-sm-8">@Model.CompanyDisplay</dd>
+
+                    <dt class="col-sm-4">Vendor</dt>
+                    <dd class="col-sm-8">@Model.VendorDisplay</dd>
+
+                    <dt class="col-sm-4">Scheduled Date</dt>
+                    <dd class="col-sm-8">@Model.ScheduledPaymentDateDisplay</dd>
+
+                    <dt class="col-sm-4">Requested IST</dt>
+                    <dd class="col-sm-8">@Model.RequestedAtDisplay</dd>
+
+                    <dt class="col-sm-4">Requested By</dt>
+                    <dd class="col-sm-8">
+                        <div>@Model.RequestedByName</div>
+                        <div class="small text-muted">@Model.RequestedByEmail</div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Review Information</h2>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Reviewed By</dt>
+                    <dd class="col-sm-8">@Model.ReviewedByDisplay</dd>
+
+                    <dt class="col-sm-4">Reviewed IST</dt>
+                    <dd class="col-sm-8">@Model.ReviewedAtDisplay</dd>
+
+                    <dt class="col-sm-4">Review Notes</dt>
+                    <dd class="col-sm-8">@Model.ReviewNotesDisplay</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5 mb-2">Request Notes</h2>
+        <p class="mb-0">@Model.RequestNotesDisplay</p>
+    </div>
+</div>
+
+@if (Model.HasParent || Model.HasChildren)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Split History</h2>
+
+            @if (Model.HasParent && Model.ParentRequest is not null)
+            {
+                <div class="mb-4">
+                    <div class="text-muted small mb-2">Parent Request</div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Request</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Scheduled Date</th>
+                                    <th>Requested</th>
+                                    <th>Approved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-monospace">
+                                        <a asp-controller="@(Model.IsAdminView ? "AdminPaymentRequests" : "PaymentRequests")"
+                                           asp-action="Details"
+                                           asp-route-id="@Model.ParentRequest.Id"
+                                           class="link-info">
+                                            @Model.ParentRequest.RequestIdDisplay
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge @Model.ParentRequest.StatusBadgeClass">
+                                            @Model.ParentRequest.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge @Model.ParentRequest.PriorityBadgeClass">
+                                            @Model.ParentRequest.Priority
+                                        </span>
+                                    </td>
+                                    <td>@Model.ParentRequest.ScheduledPaymentDateDisplay</td>
+                                    <td class="font-monospace">@Model.ParentRequest.RequestedAmountDisplay</td>
+                                    <td class="font-monospace">@Model.ParentRequest.ApprovedAmountDisplay</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.HasChildren)
+            {
+                <div>
+                    <div class="text-muted small mb-2">Child Requests</div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Request</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Scheduled Date</th>
+                                    <th>Requested</th>
+                                    <th>Approved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (RelatedPaymentRequestViewModel child in Model.ChildRequests)
+                                {
+                                    <tr>
+                                        <td class="font-monospace">
+                                            <a asp-controller="@(Model.IsAdminView ? "AdminPaymentRequests" : "PaymentRequests")"
+                                               asp-action="Details"
+                                               asp-route-id="@child.Id"
+                                               class="link-info">
+                                                @child.RequestIdDisplay
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge @child.StatusBadgeClass">
+                                                @child.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @child.PriorityBadgeClass">
+                                                @child.Priority
+                                            </span>
+                                        </td>
+                                        <td>@child.ScheduledPaymentDateDisplay</td>
+                                        <td class="font-monospace">@child.RequestedAmountDisplay</td>
+                                        <td class="font-monospace">@child.ApprovedAmountDisplay</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Ledger Outflow</h2>
+
+        @if (!Model.HasLedgerOutflow || Model.LedgerOutflow is null)
+        {
+            <div class="text-muted">
+                No ledger outflow has been recorded for this request yet.
+            </div>
+        }
+        else
+        {
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Ledger</dt>
+                <dd class="col-sm-9">@Model.LedgerOutflow.LedgerDisplay</dd>
+
+                <dt class="col-sm-3">Entry Date</dt>
+                <dd class="col-sm-9">@Model.LedgerOutflow.EntryDateDisplay</dd>
+
+                <dt class="col-sm-3">Amount</dt>
+                <dd class="col-sm-9 font-monospace">@Model.LedgerOutflow.AmountDisplay</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.LedgerOutflow.DescriptionDisplay</dd>
+
+                <dt class="col-sm-3">Created By</dt>
+                <dd class="col-sm-9">
+                    <div>@Model.LedgerOutflow.CreatedByName</div>
+                    <div class="small text-muted">@Model.LedgerOutflow.CreatedByEmail</div>
+                </dd>
+
+                <dt class="col-sm-3">Created IST</dt>
+                <dd class="col-sm-9">@Model.LedgerOutflow.CreatedAtDisplay</dd>
+            </dl>
+        }
+    </div>
+</div>

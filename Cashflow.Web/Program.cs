@@ -52,6 +52,7 @@ builder.Services.AddScoped<IPaymentRequestSubmissionService, PaymentRequestSubmi
 builder.Services.AddScoped<IPaymentRequestTrackingService, PaymentRequestTrackingService>();
 builder.Services.AddScoped<IAdminPaymentRequestReviewService, AdminPaymentRequestReviewService>();
 builder.Services.AddScoped<ILedgerBalanceService, LedgerBalanceService>();
+builder.Services.AddScoped<IPaymentRequestDetailsService, PaymentRequestDetailsService>();
 
 builder.Services.AddControllersWithViews();
 

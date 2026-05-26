@@ -11,13 +11,16 @@ public class PaymentRequestsController : Controller
 {
     private readonly IPaymentRequestSubmissionService _paymentRequestSubmissionService;
     private readonly IPaymentRequestTrackingService _paymentRequestTrackingService;
+    private readonly IPaymentRequestDetailsService _paymentRequestDetailsService;
 
     public PaymentRequestsController(
-        IPaymentRequestSubmissionService paymentRequestSubmissionService,
-        IPaymentRequestTrackingService paymentRequestTrackingService)
+    IPaymentRequestSubmissionService paymentRequestSubmissionService,
+    IPaymentRequestTrackingService paymentRequestTrackingService,
+    IPaymentRequestDetailsService paymentRequestDetailsService)
     {
         _paymentRequestSubmissionService = paymentRequestSubmissionService;
         _paymentRequestTrackingService = paymentRequestTrackingService;
+        _paymentRequestDetailsService = paymentRequestDetailsService;
     }
 
     [HttpGet]
@@ -79,5 +82,19 @@ public class PaymentRequestsController : Controller
             $"Payment request #{result.PaymentRequestId} submitted successfully.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(long id, CancellationToken cancellationToken)
+    {
+        PaymentRequestDetailsViewModel? model =
+            await _paymentRequestDetailsService.GetDetailsAsync(id, User, cancellationToken);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
     }
 }

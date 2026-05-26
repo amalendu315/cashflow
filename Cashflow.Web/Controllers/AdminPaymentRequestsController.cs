@@ -3,6 +3,7 @@ using Cashflow.Web.Services;
 using Cashflow.Web.ViewModels.AdminPaymentRequests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Cashflow.Web.ViewModels.PaymentRequests;
 
 namespace Cashflow.Web.Controllers;
 
@@ -10,10 +11,14 @@ namespace Cashflow.Web.Controllers;
 public class AdminPaymentRequestsController : Controller
 {
     private readonly IAdminPaymentRequestReviewService _reviewService;
+    private readonly IPaymentRequestDetailsService _paymentRequestDetailsService;
 
-    public AdminPaymentRequestsController(IAdminPaymentRequestReviewService reviewService)
+    public AdminPaymentRequestsController(
+    IAdminPaymentRequestReviewService reviewService,
+    IPaymentRequestDetailsService paymentRequestDetailsService)
     {
         _reviewService = reviewService;
+        _paymentRequestDetailsService = paymentRequestDetailsService;
     }
 
     [HttpGet]
@@ -161,5 +166,19 @@ public class AdminPaymentRequestsController : Controller
                 : "Payment request split successfully.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(long id, CancellationToken cancellationToken)
+    {
+        PaymentRequestDetailsViewModel? model =
+            await _paymentRequestDetailsService.GetDetailsAsync(id, User, cancellationToken);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View("~/Views/PaymentRequests/Details.cshtml", model);
     }
 }

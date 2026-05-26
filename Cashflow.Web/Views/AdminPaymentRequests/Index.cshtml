@@ -78,7 +78,13 @@ else
                 @foreach (AdminPaymentRequestListItemViewModel request in Model.PendingRequests)
                 {
                     <tr>
-                        <td class="font-monospace fw-semibold">@request.RequestIdDisplay</td>
+                        <td class="font-monospace fw-semibold">
+                            <a asp-action="Details"
+                            asp-route-id="@request.Id"
+                            class="link-info">
+                                @request.RequestIdDisplay
+                            </a>
+                        </td>
                         <td>
                             <div>@request.CompanyName</div>
                             <div class="small text-muted font-monospace">@request.CompanyCode</div>

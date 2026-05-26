@@ -107,7 +107,13 @@ else
                     @foreach (PaymentRequestListItemViewModel request in Model.Requests)
                     {
                         <tr>
-                            <td class="font-monospace fw-semibold">@request.RequestIdDisplay</td>
+                            <td class="font-monospace fw-semibold">
+                                <a asp-action="Details"
+                                asp-route-id="@request.Id"
+                                class="link-info">
+                                    @request.RequestIdDisplay
+                                </a>
+                            </td>
                             <td>
                                 <div>@request.VendorName</div>
                                 <div class="small text-muted font-monospace">@request.VendorCode</div>
